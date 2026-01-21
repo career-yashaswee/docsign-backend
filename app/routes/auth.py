@@ -16,11 +16,6 @@ from app.utils.auth_utils import hash_password, verify_password
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
 
 
-# -------------------------
-# Database session helper
-# -------------------------
-
-
 @contextmanager
 def get_db():
     db: Session = SessionLocal()
@@ -28,11 +23,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-# -------------------------
-# Register
-# -------------------------
 
 
 @auth_bp.post("/register")
@@ -59,11 +49,6 @@ def register():
         )
 
 
-# -------------------------
-# Login
-# -------------------------
-
-
 @auth_bp.post("/login")
 def login():
     data = LoginRequest.model_validate(request.get_json())
@@ -81,15 +66,10 @@ def login():
         return jsonify({"access_token": token}), 200
 
 
-# -------------------------
-# Get current user
-# -------------------------
-
-
 @auth_bp.get("/me")
 @jwt_required()
 def me():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
 
     with get_db() as db:
         user = db.get(User, user_id)

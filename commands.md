@@ -27,3 +27,8 @@ docker run -d \
 
 for postgres inside the docker container : postgresql+psycopg://postgres:postgres@postgres:5432/docsign
 for postgres on the localhost : postgresql+psycopg://postgres:postgres@localhost:5432/docsign
+
+Running Flask APP Locally
+export FLASK_ENV=development
+export FLASK_APP=main:create_app
+flask run
