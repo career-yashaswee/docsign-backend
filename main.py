@@ -8,6 +8,7 @@ from app.core.logging import configure_logging
 
 from app.routes.auth import auth_bp
 from app.routes.document import documents_bp
+from app.routes.signers import signers_bp
 
 
 def create_app():
@@ -44,6 +45,7 @@ def create_app():
     # BluePrints
     app.register_blueprint(auth_bp)
     app.register_blueprint(documents_bp)
+    app.register_blueprint(signers_bp)
 
     @app.get("/health/live")
     def live():
