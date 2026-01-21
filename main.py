@@ -1,13 +1,38 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from app.core.config import settings
 from app.core.logging import configure_logging
+
+
+from app.routes.auth import auth_bp
 
 
 def create_app():
     configure_logging()
     app = Flask(__name__)
     CORS(app)
+
+    app.config["JWT_SECRET_KEY"] = settings.JWT_SECRET_KEY
+    jwt = JWTManager(app)
+
+    @jwt.invalid_token_loader
+    def invalid_token_callback(reason):
+        return jsonify({"error": "invalid_token", "detail": reason}), 401
+
+    @jwt.unauthorized_loader
+    def missing_token_callback(reason):
+        return jsonify({"error": "missing_token", "detail": reason}), 401
+
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        return jsonify({"error": "token_expired"}), 401
+
+    @jwt.needs_fresh_token_loader
+    def needs_fresh_token_callback(jwt_header, jwt_payload):
+        return jsonify({"error": "fresh_token_required"}), 401
+
+    app.register_blueprint(auth_bp)
 
     @app.get("/health/live")
     def live():
